@@ -2,23 +2,6 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
   
   def search
-    
-    # where in array
-    # params[:query] = "taro jiro"
-    # query = params[:query].split(" ")
-    # @users = User.where(name: query)
-    
-    # or
-    # @users = User.where(name: 'taro').or(User.where(name: 'jiro'))
-    
-    # like
-    # @users = User.where("name LIKE ?", "ta%").or(User.where("name LIKE ?", "ji%"))
-    #
-    # @users = User.where('(name = ?) OR (name = ?)', 'taro', 'jiro')
-    #
-    # @users = User.where('(name LIKE ?) OR (name LIKE ?)', 'ta%', 'ji%')
-    #
-    # @users = User.where('(name LIKE ?)' , 'ta%',)
 
     @query = (params[:search][:query].blank? == true ? '' : params[:search][:query])
     
@@ -26,12 +9,15 @@ class UsersController < ApplicationController
     # SQL インジェクション サンプル
     # https://railsguides.jp/security.html#sql%E3%82%A4%E3%83%B3%E3%82%B8%E3%82%A7%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3
     # 「' OR '1'='1」
-    
+
     # SQLインジェクションが発生してしまう記述方法
-    @users = User.where("name = '#{@query}'")
+    # ↓こっちを試したい場合はコメントアウトを外す
+    # @users = User.where("name = '#{@query}'")
+    # => 「' OR '2=1+1」で検索するとSQLの一部と解釈されてしまう
 
     # SQLインジェクションが防げる記述方法
     @users = User.where('(name = ?)', "#{@query}")
+    # => 「' OR '2=1+1」で検索しても検索ワードの一部として扱われる
 
     ##
     # あいまい検索
